@@ -99,6 +99,22 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               </dl>
             </div>
 
+            {/* Primary Contact */}
+            {customer.primary_contact_name && (
+              <div className="bg-white shadow rounded-lg p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-lg font-semibold text-gray-900">Primærkontakt</h2>
+                  <Link
+                    href={`/customers/${id}/contacts`}
+                    className="text-sm text-blue-600 hover:text-blue-700"
+                  >
+                    Se alle kontakter →
+                  </Link>
+                </div>
+                <p className="text-sm text-gray-900">{customer.primary_contact_name}</p>
+              </div>
+            )}
+
             {/* Notes */}
             {customer.notes && (
               <div className="bg-white shadow rounded-lg p-6">
@@ -150,7 +166,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
               <dl className="space-y-3">
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-gray-500">Kontakter</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{customer.contact_count}</dd>
+                  <dd className="text-sm font-semibold text-gray-900">
+                    <Link
+                      href={`/customers/${id}/contacts`}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      {customer.contact_count}
+                    </Link>
+                  </dd>
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-gray-500">Deals</dt>
