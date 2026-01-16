@@ -56,6 +56,14 @@ export default async function DashboardPage() {
           <p className="mt-2 text-gray-600">
             Dette er ditt Mercatur CRM dashboard. Her får du oversikt over kunder, kontakter og salg.
           </p>
+          <div className="mt-4">
+            <Link
+              href="/search"
+              className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium text-gray-700"
+            >
+              🔍 Søk i CRM
+            </Link>
+          </div>
         </div>
 
         {/* Quick Actions Grid */}
