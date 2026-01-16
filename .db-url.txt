@@ -1,0 +1,1 @@
+postgresql://postgres:eXillion20!sup@db.bsbgjdhepqjbjixfkcad.supabase.co:5432/postgres
