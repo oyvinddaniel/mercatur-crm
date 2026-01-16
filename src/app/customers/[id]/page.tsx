@@ -181,7 +181,14 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
                 </div>
                 <div className="flex justify-between">
                   <dt className="text-sm font-medium text-gray-500">Kommunikasjon</dt>
-                  <dd className="text-sm font-semibold text-gray-900">{customer.communication_count}</dd>
+                  <dd className="text-sm font-semibold text-gray-900">
+                    <Link
+                      href={`/customers/${id}/communications`}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      {customer.communication_count}
+                    </Link>
+                  </dd>
                 </div>
               </dl>
             </div>
