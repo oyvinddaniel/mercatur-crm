@@ -9,6 +9,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import { checkAuthAndEnsureProfile } from '@/lib/supabase/middleware-auth-check';
 import { LogoutButton } from './logout-button';
+import { getDashboardStats, getRecentActivity } from '@/app/actions/dashboard';
+import Link from 'next/link';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -21,6 +23,14 @@ export default async function DashboardPage() {
   }
 
   const { user, profile } = authCheck;
+
+  // Fetch dashboard statistics
+  const statsResult = await getDashboardStats();
+  const stats = 'success' in statsResult && statsResult.success ? statsResult.data : null;
+
+  // Fetch recent activity
+  const activityResult = await getRecentActivity();
+  const recentActivities = 'success' in activityResult && activityResult.success ? activityResult.data : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -105,21 +115,77 @@ export default async function DashboardPage() {
         {/* Stats Section */}
         <div className="mt-8 bg-white rounded-lg shadow p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Hurtigstatistikk</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-blue-600">0</div>
-              <div className="text-sm text-gray-600 mt-1">Totalt kunder</div>
+          {stats ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-blue-600">{stats.totalCustomers}</div>
+                <div className="text-sm text-gray-600 mt-1">Totalt kunder</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-600">{stats.totalContacts}</div>
+                <div className="text-sm text-gray-600 mt-1">Totalt kontakter</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-purple-600">{stats.activeDeals}</div>
+                <div className="text-sm text-gray-600 mt-1">Aktive deals</div>
+                {stats.activeDealValue > 0 && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    {stats.activeDealValue.toLocaleString('no-NO')} NOK
+                  </div>
+                )}
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-orange-600">{stats.recentCommunications}</div>
+                <div className="text-sm text-gray-600 mt-1">Hendelser siste 7 dager</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">0</div>
-              <div className="text-sm text-gray-600 mt-1">Aktive deals</div>
+          ) : (
+            <div className="text-center text-gray-500 py-4">
+              Kunne ikke laste statistikk
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">0</div>
-              <div className="text-sm text-gray-600 mt-1">Hendelser denne uken</div>
+          )}
+        </div>
+
+        {/* Recent Activity Section */}
+        {recentActivities.length > 0 && (
+          <div className="mt-8 bg-white rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Siste aktivitet</h3>
+            <div className="space-y-4">
+              {recentActivities.map((activity) => (
+                <div key={`${activity.type}-${activity.id}`} className="flex items-start gap-4 pb-4 border-b border-gray-100 last:border-0">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                    {activity.type === 'customer' && <span className="text-xl">👥</span>}
+                    {activity.type === 'contact' && <span className="text-xl">📞</span>}
+                    {activity.type === 'deal' && <span className="text-xl">💼</span>}
+                    {activity.type === 'communication' && <span className="text-xl">💬</span>}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    {activity.link ? (
+                      <Link
+                        href={activity.link}
+                        className="text-sm font-medium text-gray-900 hover:text-blue-600"
+                      >
+                        {activity.title}
+                      </Link>
+                    ) : (
+                      <div className="text-sm font-medium text-gray-900">{activity.title}</div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-1">{activity.description}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(activity.date).toLocaleDateString('no-NO', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );
